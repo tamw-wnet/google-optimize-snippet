@@ -49,6 +49,9 @@ class IEG_Google_Optimize_Snippet {
 
     <p>To enable Google Optimize Experiments on individual pages, you'll need to fill in both fields above AND check the 'Add Google Optimize Code' box on those pages.</p>
 
+    <p>To enable site-wide Google Optimize Experiments, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
+
+
      <p>ONLY If there's a specified cookieDomain set for this Google Analytics Property in GTM, enter the same value here:<br /><span style="color:#999;">(This is so very rare it would be set.  'auto' is a possible value, but just leave it blank unless running into specific cookieDomain mismatch warnings in Google Optimize.)</span></p>
     <input type="text" name="google-optimize-analytics-cookiedomain" value="<?php echo $this->google_analytics_cookiedomain ?>">
 
