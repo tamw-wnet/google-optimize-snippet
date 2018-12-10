@@ -108,8 +108,13 @@ class IEG_Google_Optimize_Snippet {
 
 
 	function add_optimize_snippet_to_head() {
-    $post_id = get_the_ID();
-    $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : 0;
+    if ($this->google_optimize_on_all_pages) {
+      // override anything else
+      $pagehide = TRUE;
+    } else { 
+      $post_id = get_the_ID();
+      $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : 0;
+    }
     if ($pagehide && $this->google_analytics_id && $this->google_optimize_id) {
       echo "<!-- GTM:OPTIMIZE_PAGE_HIDE --><style>.async-hide { opacity: 0 !important} </style>
 <script>(function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;h.start=1*new Date;
