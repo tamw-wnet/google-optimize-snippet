@@ -14,13 +14,17 @@ class IEG_Google_Optimize_Snippet {
   public function __construct() {
     $this->google_optimize_id = get_option( 'google-optimize-id' ) ? get_option( 'google-optimize-id' ) : '';
     $this->google_analytics_id = get_option( 'google-optimize-analytics-id' ) ? get_option( 'google-optimize-analytics-id' ) : '';
+    $this->google_optimize_on_all_pages = (get_option( 'google-optimize-on-all-pages' ) == "enable") ? TRUE : FALSE;
     $this->google_analytics_cookiedomain = get_option( 'google-optimize-analytics-cookiedomain' ) ? get_option( 'google-optimize-analytics-cookiedomain' ) : '';
 
 	  add_action('admin_menu', array( $this, 'google_optimize_admin_menu') );
     if ($this->google_optimize_id) {
       add_action('wp_head', array($this, 'add_optimize_snippet_to_head'), 1);
-      add_action('add_meta_boxes', array($this, 'meta_box_setup'));
-      add_action( 'save_post', array( $this, 'meta_box_save' ) );
+      if ($this->google_optimize_on_all_pages == FALSE) {
+        // only bother showing these if we aren't doing the snippet on all pages
+        add_action('add_meta_boxes', array($this, 'meta_box_setup'));
+        add_action( 'save_post', array( $this, 'meta_box_save' ) );
+      }
     }
   }
 
@@ -58,6 +62,7 @@ class IEG_Google_Optimize_Snippet {
   function register_gtm_settings(){
     register_setting( 'google-optimize-settings-group', 'google-optimize-id');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-id');
+    register_setting( 'google-optimize-settings-group', 'google-optimize-on-all-pages');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-cookiedomain');
 	}
 
