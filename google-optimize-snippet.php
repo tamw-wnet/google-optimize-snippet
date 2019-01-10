@@ -10,12 +10,29 @@ class IEG_Google_Optimize_Snippet {
   private $google_optimize_id;
   private $google_analytics_id;
   private $google_analytics_cookiedomain;
+  private $google_optimize_on_all_pages;
+  private $google_analytics_custom_field_defs;
 
   public function __construct() {
     $this->google_optimize_id = get_option( 'google-optimize-id' ) ? get_option( 'google-optimize-id' ) : '';
     $this->google_analytics_id = get_option( 'google-optimize-analytics-id' ) ? get_option( 'google-optimize-analytics-id' ) : '';
     $this->google_optimize_on_all_pages = (get_option( 'google-optimize-on-all-pages' ) == "enable") ? TRUE : FALSE;
     $this->google_analytics_cookiedomain = get_option( 'google-optimize-analytics-cookiedomain' ) ? get_option( 'google-optimize-analytics-cookiedomain' ) : '';
+    
+    $this->google_analytics_custom_field_defs = array(
+      'allowLinker' => 'boolean',
+      'cookieDomain' => 'text',
+      'cookieName' => 'text',
+      'cookiePath' => 'text',
+      'sampleRate' => 'number',
+      'siteSpeedSampleRate' => 'number',
+      'alwaysSendReferrer' => 'boolean',
+      'allowAnchor' => 'boolean',
+      'cookieExpires' => 'number',
+      'legacyCookieDomain' => 'text',
+      'legacyHistoryImport' => 'boolean',
+      'storeGac' => 'boolean' );
+
 
 	  add_action('admin_menu', array( $this, 'google_optimize_admin_menu') );
     if ($this->google_optimize_id) {
