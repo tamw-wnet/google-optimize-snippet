@@ -19,20 +19,22 @@ class IEG_Google_Optimize_Snippet {
     
     $this->google_analytics_custom_field_defs = array(
       'allowLinker' => 'boolean',
-      'cookieDomain' => 'text',
-      'cookieName' => 'text',
-      'cookiePath' => 'text',
-      'sampleRate' => 'number',
-      'siteSpeedSampleRate' => 'number',
+      'cookieDomain' => 'string',
+      'cookieName' => 'string',
+      'cookiePath' => 'string',
+      'sampleRate' => 'integer',
+      'siteSpeedSampleRate' => 'integer',
       'alwaysSendReferrer' => 'boolean',
       'allowAnchor' => 'boolean',
-      'cookieExpires' => 'number',
-      'legacyCookieDomain' => 'text',
+      'cookieExpires' => 'integer',
+      'legacyCookieDomain' => 'string',
       'legacyHistoryImport' => 'boolean',
       'storeGac' => 'boolean' );
 
 
 	  add_action('admin_menu', array( $this, 'google_optimize_admin_menu') );
+
+
     if ($this->google_optimize_id) {
       add_action('wp_head', array($this, 'add_optimize_snippet_to_head'), 1);
       if ($this->google_optimize_on_all_pages == FALSE) {
@@ -56,19 +58,38 @@ class IEG_Google_Optimize_Snippet {
   	<?php settings_fields( 'google-optimize-settings-group' );
 	  do_settings_sections( 'google-optimize-settings-group' );?>
 
+    <p>This plugin does the work of installing the necessary Google Optimize 'snippets' -- both the 'page-hiding' snippet and the Optimize container snippet -- in the correct place on the pages you want to run Google Optimize Experiments, but without having to directly edit your theme files.  This plugin assumes that you DO have Google Tag Manager (GTM)  installed on your website; but you shouldn't need to make any changes to your GTM setup.</p>
     <p>Running Google Optimize Experiments requires both your Google Analytics Property ID -- that you normally would just deploy via Google Tag Manager -- and also a special Google Optimize Container ID to be setup.  Visit <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a> for more details.</p>
-    <p>Enter the Google Optimize container id for this blog:<br /><span style="color:#999;">(will also start with GTM-something, but will NOT be the same value as the Google Tag Manager id)</span></p>
-    <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>">   
-    <p>Also required to do experiments: enter the Google Analytics Property id for this blog:<br /><span style="color:#999;">(will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup)</span></p>
-    <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>">
+    <p>Enter the Google Optimize container id for this blog <span class="description">(will start with GTM-something, but will NOT be the same value as the Google Tag Manager id)</span>:<br />
+    <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>"></p>   
+    <p>Also required to do experiments: enter the Google Analytics Property id for this blog <span class="description">(will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup)</span>:<br />
+    <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>"></p>
 
-    <p>To enable Google Optimize Experiments on individual pages, you'll need to fill in both fields above AND check the 'Add Google Optimize Code' box on those pages.</p>
+    <h3>Running Optimize Experiments</h3>
 
-    <p>To enable site-wide Google Optimize Experiments, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
+    <p><b>To enable Google Optimize Experiments on individual pages</b>, you'll need to fill in both fields above AND go into the individual pages in the WordPress editor view to check the 'Add Google Optimize Code' box on those pages.  This will result in both the 'page-hiding' snippet and the Google Optimize container snippet appearing on those pages.</p>
 
+    <p><b>To enable site-wide Google Optimize Experiments</b>, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
 
-     <p>ONLY If there's a specified cookieDomain set for this Google Analytics Property in GTM, enter the same value here:<br /><span style="color:#999;">(This is so very rare it would be set.  'auto' is a possible value, but just leave it blank unless running into specific cookieDomain mismatch warnings in Google Optimize.)</span></p>
-    <input type="text" name="google-optimize-analytics-cookiedomain" value="<?php echo $this->google_analytics_cookiedomain ?>">
+    <h3>Google Analytics Custom Fields</h3>
+    <p>When setting up your experiment in Optimize, you'll be prompted to validate your Optimize snippet code.  You may get a warning that there's a mismatch with your GTM setup.   This is usually because your existing Google Analytics tracker in GTM has custom fields set -- find the Google Analytics tag in GTM and look under "fields to set".  If one of the following fields has some non-empty value in that Google Analytics tag in GTM, it must have the same value here.  <b>Leave the field blank if it isn't set in GTM!</b>  That said, it is common for "allowLinker" to be "true" and "cookieDomain" to be "auto" -- but again, check your GTM settings.</p><?php
+    $ga_fields_to_set = $this->google_analytics_custom_field_defs;
+    $ga_custom_fields = get_option( 'google-optimize-analytics-custom-fields' ) ? get_option( 'google-optimize-analytics-custom-fields' ) : array();
+
+    // special case for importing legacy cookiedomain option into new structure
+    if (empty($ga_custom_fields)) {
+      $legacy_cookie_option = get_option('google-optimize-analytics-cookiedomain');
+      if ($legacy_cookie_option) {
+        $ga_custom_fields['cookieDomain'] = $legacy_cookie_option;
+      }
+    }
+
+    foreach ($ga_fields_to_set as $field => $datatype) {
+      $value = !empty($ga_custom_fields[$field]) ? $ga_custom_fields[$field] : '';
+      $class = ($datatype != "string") ? "small-text" : "medium-text";
+      echo "<span style='display:inline-block;'><label for $field>$field</label><input type=text class=$class name=google-optimize-analytics-custom-fields[$field] value=\"$value\"><i>($datatype)</i></span> &nbsp;&nbsp; <wbr />";
+    }
+    ?>
 
  
 	  <?php submit_button(); ?>
