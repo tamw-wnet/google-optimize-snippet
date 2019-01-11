@@ -58,11 +58,11 @@ class IEG_Google_Optimize_Snippet {
   	<?php settings_fields( 'google-optimize-settings-group' );
 	  do_settings_sections( 'google-optimize-settings-group' );?>
 
-    <p>This plugin does the work of installing the necessary Google Optimize 'snippets' -- both the 'page-hiding' snippet and the Optimize container snippet -- in the correct place on the pages you want to run Google Optimize Experiments, but without having to directly edit your theme files.  This plugin assumes that you DO have Google Tag Manager (GTM)  installed on your website; but you shouldn't need to make any changes to your GTM setup.</p>
+    <p>This plugin does the work of installing the necessary Google Optimize 'snippets' -- both the 'page-hiding' snippet and the Optimize container snippet -- in the correct place on the pages you want to run Google Optimize Experiments, but without having to directly edit your theme files.  This plugin is based on the Optimize documentation <a href="https://support.google.com/optimize/answer/7359264" target=_new>here</a> and assumes that you DO have Google Tag Manager (GTM)  installed on your website; but you shouldn't need to make any changes to your GTM setup.</p>
     <p>Running Google Optimize Experiments requires both your Google Analytics Property ID -- that you normally would just deploy via Google Tag Manager -- and also a special Google Optimize Container ID to be setup.  Visit <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a> for more details.</p>
     <p>Enter the Google Optimize container id for this blog <span class="description">(will start with GTM-something, but will NOT be the same value as the Google Tag Manager id)</span>:<br />
     <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>"></p>   
-    <p>Also required to do experiments: enter the Google Analytics Property id for this blog <span class="description">(will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup)</span>:<br />
+    <p>Enter the Google Analytics Property id for this blog <span class="description">(will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup)</span>:<br />
     <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>"></p>
 
     <h3>Running Optimize Experiments</h3>
