@@ -69,6 +69,10 @@ class IEG_Google_Optimize_Snippet {
 
     <p><b>To enable Google Optimize Experiments on individual pages</b>, you'll need to fill in both fields above AND go into the individual pages in the WordPress editor view to check the 'Add Google Optimize Code' box on those pages.  This will result in both the 'page-hiding' snippet and the Google Optimize container snippet appearing on those pages.</p>
 
+    <?php $optimize_on_home = (get_option( 'google-optimize-on-home' ) == "enable") ? TRUE : FALSE; ?>
+
+    <p><b>To enable Google Optimize Experiments on the front/home page</b>,  check this box: <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /> The home/front page doesn't have metaboxes, so you'll configure it here.</p>
+
     <p><b>To enable site-wide Google Optimize Experiments</b>, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
 
     <h3>Google Analytics Custom Fields</h3>
@@ -102,6 +106,8 @@ class IEG_Google_Optimize_Snippet {
     register_setting( 'google-optimize-settings-group', 'google-optimize-id');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-id');
     register_setting( 'google-optimize-settings-group', 'google-optimize-on-all-pages');
+    register_setting( 'google-optimize-settings-group', 'google-optimize-on-home');
+    register_setting( 'google-optimize-settings-group', 'google-optimize-on-archive');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-custom-fields');
 	}
 
@@ -151,6 +157,19 @@ class IEG_Google_Optimize_Snippet {
       $post_id = get_the_ID();
       $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : FALSE;
       return $pagehide;
+    }
+    $optimize_on_home = (get_option( 'google-optimize-on-home' ) == "enable") ? TRUE : FALSE;
+    if ($optimize_on_home) {
+      if ( is_front_page() && is_home() ) {
+        // Default homepage
+        return TRUE;
+      } elseif ( is_front_page() ) {
+        // static homepage
+        return TRUE;
+      } elseif ( is_home() ) {
+        // blog page
+        return TRUE;
+      }
     }
     return FALSE;  
   }
