@@ -11,7 +11,8 @@ Creating a Google Optimize experiment can be somewhat complex.  Getting the requ
 1. Upload the 'google-optimize-snippet' folder to the `/wp-content/plugins/` directory.
 2. Activate the plugin through the 'Plugins' menu in WordPress.
 3. Go to the Google Optimize Settings page in the 'Settings' menu in WordPress and fill in the necessary fields of Google Analytics Property ID and Google Optimize Container ID (details of where to get those are on the Settings page). 
-4. If running experiments on individual pages, go to the page in the WordPress admin, find the "Google Optimize Settings" box, and check that box on any page you are running an experiment on. 
+4. If running experiments on individual pages, go to the page in the WordPress admin, find the "Google Optimize Settings" box, and check that box on any page you are running an experiment on.
+5. To run experiments on the home/front page, or on archive pages, check the appropriate options on the Google Optimize Settings page in the 'Settings' menu. 
 
 ## License
 
