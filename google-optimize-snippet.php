@@ -188,7 +188,8 @@ class IEG_Google_Optimize_Snippet {
       if (empty($archive_pages)) {
         return FALSE;
       }
-      error_log(json_encode($archive_pages));
+      // for the moment only one archive page is possible but that's just a UI problem on the settings page
+      // this code will handle multiple without change
       foreach ($archive_pages as $archive_page) {
         if (!empty($archive_page['archive_type']) && !empty($archive_page['slug'])) {
           switch($archive_page['archive_type']) {
