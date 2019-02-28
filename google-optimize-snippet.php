@@ -142,50 +142,60 @@ class IEG_Google_Optimize_Snippet {
   }
 
 
-
-	function add_optimize_snippet_to_head() {
+  function snippet_should_be_included_on_page() {
     if ($this->google_optimize_on_all_pages) {
       // override anything else
-      $pagehide = TRUE;
-    } else { 
-      $post_id = get_the_ID();
-      $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : 0;
+      return TRUE;
     }
-    if ($pagehide && $this->google_analytics_id && $this->google_optimize_id) {
-      $ga_fields_to_set = $this->google_analytics_custom_field_defs;
-      $ga_custom_fields = get_option( 'google-optimize-analytics-custom-fields' ) ? get_option( 'google-optimize-analytics-custom-fields' ) : array();
-      if (empty($ga_custom_fields)) {
-        $custom_field_json = '';
-      } else {
-        $custom_field_array = array();
-        foreach ($ga_fields_to_set as $field => $datatype) {
-          if (!empty($ga_custom_fields[$field])) {
-            $value = $ga_custom_fields[$field];
-            settype($value, $datatype);
-            $custom_field_array[$field] = $value;
-          }
+    if (is_single()){ 
+      $post_id = get_the_ID();
+      $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : FALSE;
+      return $pagehide;
+    }
+    return FALSE;  
+  }
+
+
+	function add_optimize_snippet_to_head() {
+    if (empty($this->google_analytics_id) || empty($this->google_optimize_id)) {
+      // required fields missing, return
+      return;
+    }
+    if (!$this->snippet_should_be_included_on_page()) {
+      return;
+    }
+    $ga_fields_to_set = $this->google_analytics_custom_field_defs;
+    $ga_custom_fields = get_option( 'google-optimize-analytics-custom-fields' ) ? get_option( 'google-optimize-analytics-custom-fields' ) : array();
+    if (empty($ga_custom_fields)) {
+      $custom_field_json = '';
+    } else {
+      $custom_field_array = array();
+      foreach ($ga_fields_to_set as $field => $datatype) {
+        if (!empty($ga_custom_fields[$field])) {
+          $value = $ga_custom_fields[$field];
+          settype($value, $datatype);
+          $custom_field_array[$field] = $value;
         }
-        $custom_field_json = "," .  json_encode($custom_field_array, JSON_UNESCAPED_UNICODE);
       }
+      $custom_field_json = "," .  json_encode($custom_field_array, JSON_UNESCAPED_UNICODE);
+    }
       
-      echo "<!-- GTM:OPTIMIZE_PAGE_HIDE --><style>.async-hide { opacity: 0 !important} </style>
+    echo "<!-- GTM:OPTIMIZE_PAGE_HIDE --><style>.async-hide { opacity: 0 !important} </style>
 <script>(function(a,s,y,n,c,h,i,d,e){s.className+=' '+y;h.start=1*new Date;
 h.end=i=function(){s.className=s.className.replace(RegExp(' ?'+y),'')};
 (a[n]=a[n]||[]).hide=h;setTimeout(function(){i();h.end=null},c);h.timeout=c;
 })(window,document.documentElement,'async-hide','dataLayer',4000,
 {'" .  $this->google_optimize_id . "':true});</script>";
-      echo "<!-- GOOGLE_ANALYTICS_OPTIMIZE_SNIPPET -->
+    echo "<!-- GOOGLE_ANALYTICS_OPTIMIZE_SNIPPET -->
 <script>
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 ga('create', '" . $this->google_analytics_id . "'" . $custom_field_json . ");";
-      echo "ga('require', '" . $this->google_optimize_id . "');
+    echo "ga('require', '" . $this->google_optimize_id . "');
 </script>";
-    }
   }
-
 }
 
 $ieg_gos = new IEG_Google_Optimize_Snippet();
