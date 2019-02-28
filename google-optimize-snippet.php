@@ -73,6 +73,18 @@ class IEG_Google_Optimize_Snippet {
 
     <p><b>To enable Google Optimize Experiments on the front/home page</b>,  check this box: <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /> The home/front page doesn't have metaboxes, so you'll configure it here.</p>
 
+    <p><b>"Archive" pages</b> also don't have metaboxes, so Optimize Experiments for those also must be configured here.  Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy.  
+    <br />Archive type:<select name="google-optimize-analytics-archive-pages[0][archive_type]"><option value="">Disabled</option><?php 
+    $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array();
+    $archive_types = array('post_type', 'category', 'taxonomy');
+    foreach ($archive_types as $archive_type) {
+      $selected = ($archive_pages[0]['archive_type'] == $archive_type) ? "selected" : '';
+      echo "<option value=$archive_type $selected>$archive_type</option>"; 
+    }
+    echo '</select>  Slug (the post type, category, or taxonomy): <input type=text name="google-optimize-analytics-archive-pages[0][slug]" value = "' . (!empty($archive_pages[0]['slug']) ? $archive_pages[0]['slug'] : '') . '"> Term (optional extra for taxonomy if trying to do a page for a specific term): <input type=text name="google-optimize-analytics-archive-pages[0][second_level]" value = "' . (!empty($archive_pages[0]['second_level']) ? $archive_pages[0]['second_level'] : '') . '">'; 
+
+    ?> <br /><i>Currently only one archive page at a time can have an experiment run on it, but the functionality to select multiples is coming.</i></p>
+
     <p><b>To enable site-wide Google Optimize Experiments</b>, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
 
     <h3>Google Analytics Custom Fields</h3>
@@ -107,7 +119,7 @@ class IEG_Google_Optimize_Snippet {
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-id');
     register_setting( 'google-optimize-settings-group', 'google-optimize-on-all-pages');
     register_setting( 'google-optimize-settings-group', 'google-optimize-on-home');
-    register_setting( 'google-optimize-settings-group', 'google-optimize-on-archive');
+    register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-archive-pages');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-custom-fields');
 	}
 
@@ -169,6 +181,42 @@ class IEG_Google_Optimize_Snippet {
       } elseif ( is_home() ) {
         // blog page
         return TRUE;
+      }
+    }
+    if (is_archive()) {
+      $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array();
+      if (empty($archive_pages)) {
+        return FALSE;
+      }
+      error_log(json_encode($archive_pages));
+      foreach ($archive_pages as $archive_page) {
+        if (!empty($archive_page['archive_type']) && !empty($archive_page['slug'])) {
+          switch($archive_page['archive_type']) {
+            case 'post_type':
+              if (is_post_type_archive()) {
+                if (get_post_type() == $archive_page['slug']) {
+                  return TRUE;
+                }
+              }
+              break;
+            case 'category':
+              if (is_category($archive_page['slug'])) {
+                return TRUE;
+              }
+              break;
+            case 'taxonomy':
+              if (!empty($archive_page['second_level'])) {
+                if (is_tax($archive_page['slug'], $archive_page['second_level'])) {
+                  return TRUE;
+                } 
+              } else {
+                if (is_tax($archive_page['slug'])) {
+                  return TRUE;
+                }
+              }
+              break;
+          }
+        }
       }
     }
     return FALSE;  
