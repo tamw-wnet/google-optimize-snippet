@@ -165,7 +165,7 @@ class IEG_Google_Optimize_Snippet {
       // override anything else
       return TRUE;
     }
-    if (is_single()){ 
+    if (is_single() || is_page()){ 
       $post_id = get_the_ID();
       $pagehide = get_post_meta( $post_id, '_google_optimize_pagehide' ) ? get_post_meta( $post_id, '_google_optimize_pagehide', true ) : FALSE;
       return $pagehide;
