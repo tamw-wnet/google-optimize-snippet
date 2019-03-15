@@ -94,7 +94,7 @@ class IEG_Google_Optimize_Snippet {
       if ($new_offset == 0) { 
         echo '<button class=cloner>Add more rows</button></div>';
       } else {
-        echo '<button class=deleter>Delete</button></div>';
+        echo '<button class=deleter>Remove row</button></div>';
       }
       $new_offset++;
     } ?>
@@ -113,7 +113,7 @@ class IEG_Google_Optimize_Snippet {
           $('select option[value=""]', newclone).attr('selected', 'selected');
           $('.goa_slug', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][slug]").attr('value', '');
           $('.goa_second_level', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][second_level]").attr('value', '');
-          $('button.cloner', newclone).toggleClass('cloner deleter').html('Delete').show();
+          $('button.cloner', newclone).toggleClass('cloner deleter').html('Remove row').show();
           
           $('button.deleter', newclone).on("click", function(event) {
             event.preventDefault()
