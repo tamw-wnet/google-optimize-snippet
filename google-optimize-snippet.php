@@ -52,28 +52,31 @@ class IEG_Google_Optimize_Snippet {
 
   function google_optimize_admin(){ 
     ?>
-	  <br /><h1>Google Optimize Settings</h1>
-  	<br />
+	  <h1>Google Optimize Settings</h1>
 	  <form method="post" action="options.php">
   	<?php settings_fields( 'google-optimize-settings-group' );
 	  do_settings_sections( 'google-optimize-settings-group' );?>
 
     <p>This plugin does the work of installing the necessary Google Optimize 'snippets' -- both the 'page-hiding' snippet and the Optimize container snippet -- in the correct place on the pages you want to run Google Optimize Experiments, but without having to directly edit your theme files.  This plugin is based on the Optimize documentation <a href="https://support.google.com/optimize/answer/7359264" target=_new>here</a> and assumes that you DO have Google Tag Manager (GTM)  installed on your website; but you shouldn't need to make any changes to your GTM setup.</p>
-    <p>Running Google Optimize Experiments requires both your Google Analytics Property ID -- that you normally would just deploy via Google Tag Manager -- and also a special Google Optimize Container ID to be setup.  Visit <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a> for more details.</p>
-    <p>Enter the Google Optimize container id for this blog <span class="description">(will start with GTM-something, but will NOT be the same value as the Google Tag Manager id)</span>:<br />
-    <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>"></p>   
-    <p>Enter the Google Analytics Property id for this blog <span class="description">(will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup)</span>:<br />
-    <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>"></p>
+    <p>Running Google Optimize Experiments requires both your Google Analytics Property ID -- the same Property ID you have deployed via Google Tag Manager -- and also a special Google Optimize Container ID that you'll get when you set up your Google Optimize account.  Visit <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a> to set up your account, manage your container(s), and create and run experiments.</p>
+    <h3>Settings</h3>
+    <p><b>Google Optimize Container ID: </b> <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>">
+    <span class="description">This will start with GTM-something, but will NOT be the same value as the Google Tag Manager ID.  You should only have one Container per website.</span></p>
+    <p><b>Google Analytics Property ID: </b> <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>">
+    <span class="description">This will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup. This Analytics property will match the Google Analytics property where you track your experiment results.</span></p>
 
-    <h3>Running Optimize Experiments</h3>
+    <h3>Placing the Optimize Codeblock</h3>
+    <p class="description">The sections below handle placing both the 'page-hiding' snippet and the Google Optimize container snippet onto the appropriate places in your website.  In any case the snippets will only appear after you've filled in your Google Analytics Property ID and Optimize Container ID above.</p>
 
-    <p><b>To enable Google Optimize Experiments on individual pages</b>, you'll need to fill in both fields above AND go into the individual pages in the WordPress editor view to check the 'Add Google Optimize Code' box on those pages.  This will result in both the 'page-hiding' snippet and the Google Optimize container snippet appearing on those pages.</p>
+    <h4>Posts, Pages, and Custom Post Type items</h4>
+    <p>Go into the individual pages, posts, or custom post types in the WordPress editor view to check the 'Add Google Optimize Code' box on those items.</p>
 
+    <h4>Home Page or Front Page</h4>
     <?php $optimize_on_home = (get_option( 'google-optimize-on-home' ) == "enable") ? TRUE : FALSE; ?>
+    <p>To enable Google Optimize Experiments on the front/home page of your website <b>check this box:</b> <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /></p>
 
-    <p><b>To enable Google Optimize Experiments on the front/home page</b>,  check this box: <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /> The home/front page doesn't have metaboxes, so you'll configure it here.</p>
-
-    <p><b>"Archive" pages</b> also don't have metaboxes, so Optimize Experiments for those also must be configured here.  Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy.</p>
+    <h4>Archive Pages</h4>
+    <p>Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy.  Pick an archive type ("post_type", "category", or "taxonomy" and enter the slug (eg "posts", "entertainment", or "directors").  For "taxonomy" archives, optionally enter the term (eg "archive type: taxonomy; slug: directors; term: sofia-coppola).  Multiple archive pages can be specified, click 'add more rows' below.</p>
     <div id="google-optimize-analytics-archive-list">
     <?php 
     $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array('archive_type' => '' );
@@ -90,7 +93,7 @@ class IEG_Google_Optimize_Snippet {
         $selected = ($archive_page['archive_type'] == $archive_type) ? "selected" : '';
         echo "<option value=$archive_type $selected>$archive_type</option>"; 
       }
-      echo '</select>  Slug (the post type, category, or taxonomy): <input class=goa_slug type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][slug]" value = "' . (!empty($archive_page['slug']) ? $archive_page['slug'] : '') . '"> Term (optional extra for taxonomy if trying to do a page for a specific term): <input class=goa_second_level type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][second_level]" value = "' . (!empty($archive_page['second_level']) ? $archive_page['second_level'] : '') . '">'; 
+      echo '</select>  Slug (the post type, category, or taxonomy): <input class=goa_slug type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][slug]" value = "' . (!empty($archive_page['slug']) ? $archive_page['slug'] : '') . '"> Term (optional, only used for taxonomy): <input class=goa_second_level type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][second_level]" value = "' . (!empty($archive_page['second_level']) ? $archive_page['second_level'] : '') . '">'; 
       if ($new_offset == 0) { 
         echo '<button class=cloner>Add more rows</button></div>';
       } else {
@@ -129,7 +132,8 @@ class IEG_Google_Optimize_Snippet {
       });
     </script>
 
-    <p><b>To enable site-wide Google Optimize Experiments</b>, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
+    <h4>Site-wide</h4>
+    <p>To enable site-wide Google Optimize Experiments <b>check this box:</b> <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> <br />WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment; an example might be a change to your global navigation. </p>
 
     <h3>Google Analytics Custom Fields</h3>
     <p>When setting up your experiment in Optimize, you'll be prompted to validate your Optimize snippet code.  You may get a warning that there's a mismatch with your GTM setup.   This is usually because your existing Google Analytics tracker in GTM has custom fields set -- find the Google Analytics tag in GTM and look under "fields to set".  If one of the following fields has some non-empty value in that Google Analytics tag in GTM, it must have the same value here.  <b>Leave the field blank if it isn't set in GTM!</b>  That said, it is common for "allowLinker" to be "true" and "cookieDomain" to be "auto" -- but again, check your GTM settings.</p><?php
