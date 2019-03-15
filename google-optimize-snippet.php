@@ -73,17 +73,61 @@ class IEG_Google_Optimize_Snippet {
 
     <p><b>To enable Google Optimize Experiments on the front/home page</b>,  check this box: <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /> The home/front page doesn't have metaboxes, so you'll configure it here.</p>
 
-    <p><b>"Archive" pages</b> also don't have metaboxes, so Optimize Experiments for those also must be configured here.  Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy.  
-    <br />Archive type:<select name="google-optimize-analytics-archive-pages[0][archive_type]"><option value="">Disabled</option><?php 
-    $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array();
-    $archive_types = array('post_type', 'category', 'taxonomy');
-    foreach ($archive_types as $archive_type) {
-      $selected = ($archive_pages[0]['archive_type'] == $archive_type) ? "selected" : '';
-      echo "<option value=$archive_type $selected>$archive_type</option>"; 
-    }
-    echo '</select>  Slug (the post type, category, or taxonomy): <input type=text name="google-optimize-analytics-archive-pages[0][slug]" value = "' . (!empty($archive_pages[0]['slug']) ? $archive_pages[0]['slug'] : '') . '"> Term (optional extra for taxonomy if trying to do a page for a specific term): <input type=text name="google-optimize-analytics-archive-pages[0][second_level]" value = "' . (!empty($archive_pages[0]['second_level']) ? $archive_pages[0]['second_level'] : '') . '">'; 
+    <p><b>"Archive" pages</b> also don't have metaboxes, so Optimize Experiments for those also must be configured here.  Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy.</p>
+    <div id="google-optimize-analytics-archive-list">
+    <?php 
+    $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array('archive_type' => '' );
 
-    ?> <br /><i>Currently only one archive page at a time can have an experiment run on it, but the functionality to select multiples is coming.</i></p>
+    $new_offset = 0; // things can get out of order, so if what was #3 ends up being #2 because #1 was empty, they'll be saved in the array pos $new_offset
+    foreach ($archive_pages as $archive_page) {
+      if (empty($archive_page['archive_type']) && $new_offset > 0) {
+        continue;
+      }
+      ?>
+      <div class="google-optimize-analytics-archive-def">Archive type:<select name="google-optimize-analytics-archive-pages[<?php echo $new_offset; ?>][archive_type]"><option value="">Disabled</option><?php 
+      $archive_types = array('post_type', 'category', 'taxonomy');
+      foreach ($archive_types as $archive_type) {
+        $selected = ($archive_page['archive_type'] == $archive_type) ? "selected" : '';
+        echo "<option value=$archive_type $selected>$archive_type</option>"; 
+      }
+      echo '</select>  Slug (the post type, category, or taxonomy): <input class=goa_slug type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][slug]" value = "' . (!empty($archive_page['slug']) ? $archive_page['slug'] : '') . '"> Term (optional extra for taxonomy if trying to do a page for a specific term): <input class=goa_second_level type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][second_level]" value = "' . (!empty($archive_page['second_level']) ? $archive_page['second_level'] : '') . '">'; 
+      if ($new_offset == 0) { 
+        echo '<button class=cloner>Add more rows</button></div>';
+      } else {
+        echo '<button class=deleter>Delete</button></div>';
+      }
+      $new_offset++;
+    } ?>
+    </div>
+    <script>
+      jQuery( function($) {
+        var clonecount = $(".cloner").length;
+        clonecount += $(".deleter").length;
+
+        $("button.cloner").on("click", function(event) {
+          event.preventDefault()
+          clonecount++;
+          var thisparent = $(this).parent("div");
+          var newclone = $(thisparent).clone().appendTo("#google-optimize-analytics-archive-list");
+          $('select', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][archive_type]");
+          $('select option[value=""]', newclone).attr('selected', 'selected');
+          $('.goa_slug', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][slug]").attr('value', '');
+          $('.goa_second_level', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][second_level]").attr('value', '');
+          $('button.cloner', newclone).toggleClass('cloner deleter').html('Delete').show();
+          
+          $('button.deleter', newclone).on("click", function(event) {
+            event.preventDefault()
+            $(this).parent("div").remove();
+            clonecount--;
+          });
+        });
+        $("button.deleter").on("click", function(event) {
+          event.preventDefault()
+          $(this).parent("div").remove();
+          clonecount--;
+        });
+      });
+    </script>
 
     <p><b>To enable site-wide Google Optimize Experiments</b>, check this box: <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment. </p>
 
