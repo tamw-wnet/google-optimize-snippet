@@ -14,6 +14,10 @@ Creating a Google Optimize experiment can be somewhat complex.  Getting the requ
 4. If running experiments on individual pages, go to the page in the WordPress admin, find the "Google Optimize Settings" box, and check that box on any page you are running an experiment on.
 5. To run experiments on the home/front page, or on archive pages, check the appropriate options on the Google Optimize Settings page in the 'Settings' menu. 
 
+## More information
+
+See https://ieg.wnet.org/2019/03/setting-up-google-optimize-on-wordpress/ for a narrative description of the ins and outs of integrating Google Optimize into WordPress.
+
 ## License
 
 GPLv2 or later
