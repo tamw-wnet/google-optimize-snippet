@@ -105,7 +105,7 @@ class IEG_Google_Optimize_Snippet {
         $selected = ($archive_page['archive_type'] == $archive_type) ? "selected" : '';
         echo "<option value=$archive_type $selected>$archive_type</option>"; 
       }
-      echo '</select>  Slug (the post type, category, or taxonomy): <input class=goa_slug type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][slug]" value = "' . (!empty($archive_page['slug']) ? $archive_page['slug'] : '') . '"> Term (optional, only used for taxonomy): <input class=goa_second_level type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][second_level]" value = "' . (!empty($archive_page['second_level']) ? $archive_page['second_level'] : '') . '">'; 
+      echo '</select>  Slug: <input class=goa_slug type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][slug]" value = "' . (!empty($archive_page['slug']) ? $archive_page['slug'] : '') . '"> Term (optional): <input class=goa_second_level type=text name="google-optimize-analytics-archive-pages['. $new_offset .'][second_level]" value = "' . (!empty($archive_page['second_level']) ? $archive_page['second_level'] : '') . '">'; 
       if ($new_offset == 0) { 
         echo '<button class=cloner>Add more rows</button></div>';
       } else {
@@ -116,10 +116,9 @@ class IEG_Google_Optimize_Snippet {
     </div>
     <script>
       jQuery( function($) {
-        var clonecount = $(".cloner").length;
-        clonecount += $(".deleter").length;
+        var clonecount = $(".google-optimize-analytics-archive-def .deleter").length;
 
-        $("button.cloner").on("click", function(event) {
+        $(".google-optimize-analytics-archive-def button.cloner").on("click", function(event) {
           event.preventDefault()
           clonecount++;
           var thisparent = $(this).parent("div");
@@ -129,14 +128,13 @@ class IEG_Google_Optimize_Snippet {
           $('.goa_slug', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][slug]").attr('value', '');
           $('.goa_second_level', newclone).attr('name', "google-optimize-analytics-archive-pages["+clonecount+"][second_level]").attr('value', '');
           $('button.cloner', newclone).toggleClass('cloner deleter').html('Remove row').show();
-          
           $('button.deleter', newclone).on("click", function(event) {
             event.preventDefault()
             $(this).parent("div").remove();
             clonecount--;
           });
         });
-        $("button.deleter").on("click", function(event) {
+        $(".google-optimize-analytics-archive-def button.deleter").on("click", function(event) {
           event.preventDefault()
           $(this).parent("div").remove();
           clonecount--;
@@ -163,7 +161,7 @@ class IEG_Google_Optimize_Snippet {
     foreach ($ga_fields_to_set as $field => $datatype) {
       $value = !empty($ga_custom_fields[$field]) ? $ga_custom_fields[$field] : '';
       $class = ($datatype != "string") ? "small-text" : "medium-text";
-      echo "<span style='display:inline-block;'><label for $field>$field</label><input type=text class=$class name=google-optimize-analytics-custom-fields[$field] value=\"$value\"><i>($datatype)</i></span> &nbsp;&nbsp; <wbr />";
+      echo "<span class='google_optimize_custom_field' style='display:inline-block;'><label for $field>$field</label><input type=text class=$class name=google-optimize-analytics-custom-fields[$field] value=\"$value\"><i>($datatype)</i></span> &nbsp;&nbsp; <wbr />";
     }
     ?>
 
@@ -257,8 +255,6 @@ class IEG_Google_Optimize_Snippet {
       if (empty($archive_pages)) {
         return FALSE;
       }
-      // for the moment only one archive page is possible but that's just a UI problem on the settings page
-      // this code will handle multiple without change
       foreach ($archive_pages as $archive_page) {
         if (!empty($archive_page['archive_type']) && !empty($archive_page['slug'])) {
           switch($archive_page['archive_type']) {
