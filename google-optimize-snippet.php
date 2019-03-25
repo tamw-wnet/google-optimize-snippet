@@ -2,7 +2,7 @@
 /*
 Plugin Name: Google Optimize Snippet
 Description: Sets up the Google Optimize Snippet and provides a checkbox to add it on any page or post.
-Version: 1.2
+Version: 1.3 Added Custom Paths
 Author: Will Tam
 */
 
