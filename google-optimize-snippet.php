@@ -142,7 +142,57 @@ class IEG_Google_Optimize_Snippet {
       });
     </script>
 
-    <h4>Site-wide</h4>
+
+
+    <h3>Other custom paths</h3>
+    <p>It is possible to have a location on your site that isn't a post, page, custom post type, home/front page, or archive.  This would be a very unusual situation, such as the login page for your site.  Enter the path(s), without either beginning or trailing slash, below.  <i>eg: <?php echo site_url('members/login/'); ?> would be 'members/login'</i></p>
+    <div id="google-optimize-custom-path-list">
+    <?php
+    $custom_paths = get_option( 'google-optimize-custom-paths' ) ? get_option( 'google-optimize-custom-paths' ) : array('0' =>'');
+
+    $new_offset = 0; // things can get out of order, so if what was #3 ends up being #2 because #1 was empty, they'll be saved in the array pos $new_offset
+    foreach ($custom_paths as $custom_path) {
+      if (empty($custom_path) && $new_offset > 0) {
+        continue;
+      }
+      ?>
+      <div class="google-optimize-custom-path">
+      Path: <input type=text class=regular-text name="google-optimize-custom-paths['<?php echo $new_offset; ?>']" value = "<?php echo (!empty(trim($custom_path)) ? trim($custom_path) : ''); ?>"><?php
+      if ($new_offset == 0) {
+        echo '<button class=cloner>Add more paths</button></div>';
+      } else {
+        echo '<button class=deleter>Remove path</button></div>';
+      }
+      $new_offset++;
+    } ?>
+    </div>
+    <script>
+      jQuery( function($) {
+        var pathcount = $(".google-optimize-custom-path .deleter").length;
+
+        $(".google-optimize-custom-path button.cloner").on("click", function(event) {
+          event.preventDefault()
+          pathcount++;
+          var thisparent = $(this).parent("div");
+          var newclone = $(thisparent).clone().appendTo("#google-optimize-custom-path-list");
+          $('input', newclone).attr('name', "google-optimize-custom-paths['"+pathcount+"']").attr('value', '');
+          $('button.cloner', newclone).toggleClass('cloner deleter').html('Remove path').show();
+
+          $('button.deleter', newclone).on("click", function(event) {
+            event.preventDefault()
+            $(this).parent("div").remove();
+            pathcount--;
+          });
+        });
+        $(".google-optimize-custom-path button.deleter").on("click", function(event) {
+          event.preventDefault()
+          $(this).parent("div").remove();
+          pathcount--;
+        });
+      });
+    </script>
+
+    <h3>Site-wide</h3>
     <p>To enable site-wide Google Optimize Experiments <b>check this box:</b> <input type="checkbox" name="google-optimize-on-all-pages" value="enable" <?php echo ($this->google_optimize_on_all_pages ? "checked" : ""); ?> /> <br />WARNING: Checking the box will put extra javascript on every page of your site and will slighly delay the rendering of every page on your site.  ONLY check the box if you need to do a site-wide experiment; an example might be a change to your global navigation. </p>
 
     <h3>Google Analytics Custom Fields</h3>
@@ -187,6 +237,7 @@ class IEG_Google_Optimize_Snippet {
     register_setting( 'google-optimize-settings-group', 'google-optimize-on-all-pages');
     register_setting( 'google-optimize-settings-group', 'google-optimize-on-home');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-archive-pages');
+    register_setting( 'google-optimize-settings-group', 'google-optimize-custom-paths');
     register_setting( 'google-optimize-settings-group', 'google-optimize-analytics-custom-fields');
 	}
 
@@ -284,6 +335,22 @@ class IEG_Google_Optimize_Snippet {
           }
         }
       }
+      // archive page but not matching the archive_pages array
+      return FALSE;
+    }
+    // lastly, check the custom_urls array for things that aren't posts, pages, home, or archives
+    // this case should only get reached on very rare cases since we've done return on all the other ones
+    $custom_paths = get_option( 'google-optimize-custom-paths' ) ? get_option( 'google-optimize-custom-paths' ) : array();
+
+    if (!empty($custom_paths)) {
+      global $wp;
+      $current_path = $wp->request;
+      foreach ($custom_paths as $custom_path) {
+        if ($current_path == $custom_path) {
+          return TRUE;
+        }
+      }
+      return FALSE;
     }
     return FALSE;  
   }
