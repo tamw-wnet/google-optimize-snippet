@@ -59,36 +59,36 @@ class IEG_Google_Optimize_Snippet {
 
     <p>This plugin does the work of installing the necessary Google Optimize 'snippets' -- both the 'page-hiding' snippet and the Optimize container snippet -- in the correct place on the pages you want to run Google Optimize Experiments, but without having to directly edit your theme files.  This plugin is based on the Optimize documentation <a href="https://support.google.com/optimize/answer/7359264" target=_new>here</a> and implements Google's recommended means of getting the Optimize snippets onto your pages.</p>
 
-    <h4>Google Tag Manager Integration</h4>
+    <h3>Google Tag Manager Integration</h3>
     <p>This plugin assumes that you <ol>
       <li>Have Google Tag Manager (GTM) code already installed and working on your pages,</li>
       <li>Are using GTM to include your Google Analytics tracker, firing for every page view, and</li>
       <li>Are NOT using GTM to implement the Google Optimize code and 'page hiding snippet'.</li>
     </ol>
-    You shouldn't need to make any changes to your current GTM setup to use this plugin.  This plugin will handle getting the code onto your pages.</p>
+    You shouldn't need to make any changes to your current GTM setup to use this plugin.  This plugin will handle getting the Google Optimize code onto your pages.</p>
 
-    <h4>Setting up and configuring Google Optimize</h4>
+    <h3>Setting up and configuring Google Optimize</h3>
     <p>Running Google Optimize Experiments requires both your Google Analytics Property ID -- the same Property ID you have deployed via Google Tag Manager -- and also a special Google Optimize Container ID that you'll get when you set up your Google Optimize account.  Visit <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a> to set up your account, manage your container(s), and create and run experiments.</p>
 
-    <h3>Google Settings</h3>
+    <h2>Google Settings</h2>
     <p>Before the Optimize code will appear on any pages, you must first enter values in the boxes below:</p>
     <p><b>Google Optimize Container ID: </b> <input type="text" name="google-optimize-id" value="<?php echo $this->google_optimize_id; ?>">
     <span class="description">This will start with GTM-something, but will NOT be the same value as the Google Tag Manager ID.  You should only have one Container per website. You will get this vallue from  <a href="https://www.google.com/analytics/optimize/" target =_new>Google Optimize</a>.</span></p>
     <p><b>Google Analytics Property ID: </b> <input type="text" name="google-optimize-analytics-id" value="<?php echo $this->google_analytics_id; ?>">
     <span class="description">This will start with UA-something.  You will NOT remove the Google Analytics Property ID tag from your GTM setup. This Analytics property will match the Google Analytics property where you track your experiment results.  You will get this value from <a href="https://analytics.google.com/analytics/web/" target =_new>Google Analytics</a>.</span></p>
 
-    <h3>Placing the Optimize Codeblock</h3>
+    <h2>Placing the Optimize Codeblock</h2>
     <p class="description">The sections below handle placing both the 'page-hiding' snippet and the Google Optimize container snippet onto the appropriate places in your website.  <b>You should only place the Optimize codeblock on pages that you are using Optimize to make changes to.</b></p>
 
-    <h4>Posts, Pages, and Custom Post Type items</h4>
+    <h3>Posts, Pages, and Custom Post Type items</h3>
     <p>Go into the individual pages, posts, or custom post types in the WordPress editor view to check the 'Add Google Optimize Snippets' box on those items.</p>
 
-    <h4>Home Page or Front Page</h4>
+    <h3>Home Page or Front Page</h3>
     <?php $optimize_on_home = (get_option( 'google-optimize-on-home' ) == "enable") ? TRUE : FALSE; ?>
     <p>To place the Optimize code snippets on the front/home page of your website <b>check this box:</b> <input type="checkbox" name="google-optimize-on-home" value="enable" <?php echo ($optimize_on_home ? "checked" : ""); ?> /></p>
 
-    <h4>Archive Pages</h4>
-    <p>Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy. To place the Optimize code snippets on an archive page, pick an archive type ("post_type", "category", or "taxonomy" and enter the slug (eg "posts", "entertainment", or "directors").  For "taxonomy" archives, optionally enter the term (eg "archive type: taxonomy; slug: directors; term: sofia-coppola).  Multiple archive pages can be specified, click 'add more rows' below.</p>
+    <h3>Archive Pages</h3>
+    <p>Archive pages are lists of posts with a specific post type, or lists of posts within a specific category or taxonomy. To place the Optimize code snippets on an archive page, pick an archive type ("post_type", "category", or "taxonomy" and enter the slug (eg "posts", "entertainment", or "directors").  For "taxonomy" archives, optionally enter the term (eg "archive type: taxonomy; slug: directors; term: sofia-coppola").  The "term" field will only affect taxonomy archives.  Multiple archive pages can be specified, click 'add more rows' below.</p>
     <div id="google-optimize-analytics-archive-list">
     <?php 
     $archive_pages = get_option( 'google-optimize-analytics-archive-pages' ) ? get_option( 'google-optimize-analytics-archive-pages' ) : array('archive_type' => '' );
