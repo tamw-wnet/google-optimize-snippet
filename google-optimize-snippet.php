@@ -346,7 +346,7 @@ class IEG_Google_Optimize_Snippet {
       global $wp;
       $current_path = $wp->request;
       foreach ($custom_paths as $custom_path) {
-        if ($current_path == $custom_path) {
+        if (!empty($custom_path) && ($current_path == $custom_path)) {
           return TRUE;
         }
       }
