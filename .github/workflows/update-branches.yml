@@ -2,17 +2,17 @@ name: Sync multiple branches
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
 jobs:
   sync-branch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@main
 
-      - name: Merge master -> preprod
+      - name: Merge main -> preprod
         uses: devmasx/merge-branch@v1.3.1
         with:
           type: now
-          from_branch: master
+          from_branch: main
           target_branch: preprod
           github_token: ${{ github.token }}
